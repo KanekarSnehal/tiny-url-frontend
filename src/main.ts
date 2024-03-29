@@ -1,12 +1,19 @@
-import { createApp } from 'vue'
-import { createPinia } from 'pinia'
+import { createApp } from 'vue';
+import App from './App.vue';
+import router from './router';
+import  { HttpClient } from './interceptors/http-interceptor';
+import { createPinia } from 'pinia';
 import './input.css';
-import App from './App.vue'
-import router from './router'
+const store = createPinia();
 
-const app = createApp(App)
+const app = createApp(App);
 
-app.use(createPinia())
-app.use(router)
+// Install HttpClient
+HttpClient.install(app);
 
-app.mount('#app')
+// Use router and store
+app.use(router);
+app.use(store);
+
+// Mount the app
+app.mount('#app');
