@@ -2,10 +2,19 @@ import { ref, computed, inject } from 'vue'
 import { defineStore } from 'pinia'
 
 export interface createTinyUrlPayloadDto {
-  long_url: string,
-  title?: string | null,
-  custom_back_half?: string | null,
-  generate_qr?: boolean
+  long_url: string;
+  title?: string | null;
+  custom_back_half?: string | null;
+  generate_qr?: boolean;
+}
+
+export interface createTinyUrlListDto {
+  long_url: string;
+  title?: string | null;
+  custom_back_half?: string | null;
+  qr_code?: string | null
+  id: string;
+  expiration: string;
 }
 
 export const useTinyUrlStore = defineStore('url', () => {
@@ -25,7 +34,6 @@ export const useTinyUrlStore = defineStore('url', () => {
 
   async function createTinyUrl(tinyUrlDetails: createTinyUrlPayloadDto) {
     const response = await $http.post('/url', tinyUrlDetails);
-    console.log(response);
     if (response.status == 'success') {
       console.log(response)
     } else {
@@ -33,9 +41,20 @@ export const useTinyUrlStore = defineStore('url', () => {
     }
   }
 
+  async function getAllTinyUrlList() {
+    const response = await $http.get('/url');
+    if (response.status == 'success') {
+      return response;
+    } else {
+      error.value = response;
+      return error;
+    }
+  }
+
   return {
     tinyUrl,
     createTinyUrl,
+    getAllTinyUrlList,
     error
   }
 
