@@ -8,13 +8,15 @@ export interface createTinyUrlPayloadDto {
   generate_qr?: boolean;
 }
 
-export interface createTinyUrlListDto {
+export interface tinyUrlListDto {
   long_url: string;
   title?: string | null;
   custom_back_half?: string | null;
   qr_code?: string | null
   id: string;
   expiration: string;
+  created_at: string;
+  copied?: boolean;
 }
 
 export const useTinyUrlStore = defineStore('url', () => {
@@ -51,10 +53,21 @@ export const useTinyUrlStore = defineStore('url', () => {
     }
   }
 
+  async function deleteTinyUrl(id: string) {
+    const response = await $http.delete(`/url/${id}`);
+    if (response.status == 'success') {
+      return response;
+    } else {
+      error.value = response;
+      return error;
+    }
+  }
+
   return {
     tinyUrl,
     createTinyUrl,
     getAllTinyUrlList,
+    deleteTinyUrl,
     error
   }
 
