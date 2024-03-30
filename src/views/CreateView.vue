@@ -107,7 +107,7 @@ const onSubmit = handleSubmit(async formValues => {
       generate_qr: formValues.generateQR
    }
    await tinyUrlStore.createTinyUrl(createTinyUrlPayload);
-   router.push('/home');
+   router.push('/links');
 });
 
 </script>
