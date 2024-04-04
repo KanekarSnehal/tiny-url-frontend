@@ -63,11 +63,22 @@ export const useTinyUrlStore = defineStore('url', () => {
     }
   }
 
+  async function updateTinyUrl(editUrlDetails: Partial<tinyUrlListDto>) {
+    const response = await $http.put(`/url`, editUrlDetails);
+    if (response.status == 'success') {
+      return response;
+    } else {
+      error.value = response;
+      return error;
+    }
+  }
+
   return {
     tinyUrl,
     createTinyUrl,
     getAllTinyUrlList,
     deleteTinyUrl,
+    updateTinyUrl,
     error
   }
 

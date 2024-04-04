@@ -15,7 +15,7 @@
             <div class="flex flex-col gap-4">
               <div class="flex flex-col">
                 <p class="text-xl font-bold">{{ tinyUrl.title }}</p>
-                <a target="_blank" :href="getTinyUrl(tinyUrl.id)" class="font-bold text-sky-600">{{ tinyUrl.id }}</a>
+                <a target="_blank" :href="getTinyUrl(tinyUrl.custom_back_half ? tinyUrl.custom_back_half : tinyUrl.id)" class="font-bold text-sky-600">{{ tinyUrl.custom_back_half ? tinyUrl.custom_back_half : tinyUrl.id }}</a>
                 <a target="_blank" :href="tinyUrl.long_url" class="text-sm">{{ tinyUrl.long_url }}</a>
               </div>
   
@@ -32,7 +32,7 @@
               <IconCopy/>
               {{ tinyUrl.copied ? 'Copied' : 'Copy' }}
             </button>
-            <button type="button" class="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700">
+            <button type="button" @click="openEditModal(tinyUrl)" class="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700">
               <IconEdit/>
             </button>
             <button type="button" @click="openDeleteModal(tinyUrl.id)" class="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700">
@@ -68,6 +68,8 @@
     </div>
   </div>
 
+<EditUrlDetailsModal v-if="isEditModalOpen" :editUrlDetails="editUrlDetails" @closeEditModal="closeEditModal" @submitEditDetails="submitEditDetails"/>
+
 </template>
 <script setup lang="ts">
 import IconCalendar from '@/components/icons/IconCalendar.vue';
@@ -76,6 +78,8 @@ import IconEdit from '@/components/icons/IconEdit.vue';
 import IconDelete from '@/components/icons/IconDelete.vue';
 import { useTinyUrlStore, type tinyUrlListDto } from '../stores/tinyUrl';
 import { onMounted, reactive, ref, computed } from 'vue';
+import EditUrlDetailsModal from '@/components/EditUrlDetailsModal.vue';
+import { useForm } from 'vee-validate';
 
 const tinyUrlStore = useTinyUrlStore();
 
@@ -84,6 +88,16 @@ const state: { tinyUrlList: tinyUrlListDto[] } = reactive({ tinyUrlList: [] });
 const isDeleteModalOpen = ref(false);
 
 const deleteId = ref('');
+
+const isEditModalOpen = ref(false);
+
+const editUrlDetails = ref<Partial<tinyUrlListDto>>({
+  title: '',
+  custom_back_half: '',
+  id: '',
+});
+
+
 
 onMounted(async () => {
   const response = await tinyUrlStore.getAllTinyUrlList();
@@ -114,6 +128,7 @@ async function copyText(textToCopy: string, id: string) {
   try {
     await navigator.clipboard.writeText(textToCopy);
     const obj = state.tinyUrlList.find(t => t.id == id);
+    if(obj?.copied) return;
     obj && (obj.copied = true);
     setTimeout(() => {
       obj && (obj.copied = false);
@@ -136,6 +151,26 @@ async function deleteUrl() {
   isDeleteModalOpen.value = false;
   const deleteResponse = await tinyUrlStore.deleteTinyUrl(deleteId.value);
   if (deleteResponse.status == "success") {
+    setTimeout(async () => {
+      const response = await tinyUrlStore.getAllTinyUrlList();
+      state.tinyUrlList = response.data.map((d: tinyUrlListDto) => ({ ...d, copied: false }));
+    }, 1000)
+  }
+}
+
+function openEditModal(url: tinyUrlListDto) {
+  editUrlDetails.value = url;
+  isEditModalOpen.value = true;
+}
+
+function closeEditModal() {
+  isEditModalOpen.value = false;
+};
+
+async function submitEditDetails(url: Partial<tinyUrlListDto>) {
+  const response = await tinyUrlStore.updateTinyUrl(url);
+  if (response.status == "success") {
+    isEditModalOpen.value = false;
     setTimeout(async () => {
       const response = await tinyUrlStore.getAllTinyUrlList();
       state.tinyUrlList = response.data.map((d: tinyUrlListDto) => ({ ...d, copied: false }));
