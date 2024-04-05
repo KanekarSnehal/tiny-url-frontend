@@ -1,5 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
+import SignUpView from '../views/SignupView.vue'
+import LoginViewVue from '../views/LoginView.vue'
 
 const router = createRouter({
   linkActiveClass: 'bg-blue-100 font-bold border-indigo-500',
@@ -8,6 +10,18 @@ const router = createRouter({
   routes: [
     {
       path: '/',
+      name: 'signup',
+      component: SignUpView,
+      meta: { hideHeaderAndSidebar: true }
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: LoginViewVue,
+      meta: { hideHeaderAndSidebar: true }
+    },
+    {
+      path: '/home',
       name: 'home',
       component: HomeView
     },
@@ -28,7 +42,12 @@ const router = createRouter({
       path: '/create',
       name: 'create',
       component: () => import('../views/CreateView.vue')
-    }
+    },
+    {
+      path: '/profile',
+      name: 'profile',
+      component: () => import('../views/ProfileView.vue')
+    },
   ]
 })
 
