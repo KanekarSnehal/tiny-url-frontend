@@ -120,8 +120,8 @@ const getImageSrc = (url: string, size = 32) => {
 
 
 function getTinyUrl(id: string) {
-  const frontendUrl = import.meta.env.VITE_BACKEND_URL;
-  return `${frontendUrl}/${id}`;
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  return `${backendUrl}/url/${id}`;
 }
 
 async function copyText(textToCopy: string, id: string) {
@@ -151,10 +151,8 @@ async function deleteUrl() {
   isDeleteModalOpen.value = false;
   const deleteResponse = await tinyUrlStore.deleteTinyUrl(deleteId.value);
   if (deleteResponse.status == "success") {
-    setTimeout(async () => {
       const response = await tinyUrlStore.getAllTinyUrlList();
       state.tinyUrlList = response.data.map((d: tinyUrlListDto) => ({ ...d, copied: false }));
-    }, 1000)
   }
 }
 
@@ -171,10 +169,8 @@ async function submitEditDetails(url: Partial<tinyUrlListDto>) {
   const response = await tinyUrlStore.updateTinyUrl(url);
   if (response.status == "success") {
     isEditModalOpen.value = false;
-    setTimeout(async () => {
-      const response = await tinyUrlStore.getAllTinyUrlList();
-      state.tinyUrlList = response.data.map((d: tinyUrlListDto) => ({ ...d, copied: false }));
-    }, 1000)
+    const response = await tinyUrlStore.getAllTinyUrlList();
+    state.tinyUrlList = response.data.map((d: tinyUrlListDto) => ({ ...d, copied: false }));
   }
 }
 </script>
