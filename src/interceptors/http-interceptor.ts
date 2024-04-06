@@ -1,10 +1,10 @@
-import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosResponse, AxiosError } from 'axios';
+import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosResponse, AxiosError, AxiosHeaders } from 'axios';
 import { type InternalAxiosRequestConfig } from 'axios';
 import { ref, type App } from 'vue';
 
 class HttpClient {
     private axiosInstance: AxiosInstance;
-    private accessToken = ref<string | null>(null);
+    private accessToken = ref<string | null>(localStorage.getItem('access_token'));
 
     constructor() {
         this.axiosInstance = axios.create({
@@ -17,6 +17,9 @@ class HttpClient {
         // Add a request interceptor
         this.axiosInstance.interceptors.request.use(
             (config: InternalAxiosRequestConfig) => {
+                if (this.accessToken.value && !config.url?.includes('/auth')) {
+                    config.headers.Authorization = `Bearer ${this.accessToken.value}`;
+                }
                 return config;
             },
             (error: AxiosError) => {
@@ -36,7 +39,8 @@ class HttpClient {
     }
 
     // Helper function to set the access token
-    public setAccessToken(accessToken: string | null): void {
+    public setAccessToken(accessToken: string): void {
+        localStorage.setItem('access_token', accessToken);
         this.accessToken.value = accessToken;
     }
 
