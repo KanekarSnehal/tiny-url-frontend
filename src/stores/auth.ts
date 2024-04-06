@@ -31,8 +31,10 @@ export const useAuthStore = defineStore('auth', () => {
     async function login({ email, password }: LoginParams) {
         const response = await $http.post('/auth/login', { email, password });
         if(response.status == 'success') {
-            user.value = response.data;
-            localStorage.setItem('user', JSON.stringify(response.data));
+            user.value = { email: response.data.email, name: response.data.name, profile_image: response.data.profile_image };
+            localStorage.setItem('user', JSON.stringify(user.value));
+            localStorage.setItem('access_token', response.data.access_token);
+            $http.setAccessToken(response.data.access_token);
         } else {
             error.value = response;
         }
