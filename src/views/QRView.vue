@@ -4,6 +4,11 @@
       <p class="text-3xl">QR Codes</p>
       <hr class="h-px mt-4 mb-8 bg-gray-200 border-0 dark:bg-gray-700">
        <QrCodeListItem v-for="qrCode in state.qrCodeList" :key="qrCode.id" :qrCode="qrCode" @viewQrCodeDetails="viewQrCodeDetails"/>
+
+       <div v-if="state.qrCodeList.length === 0" class="text-center mt-8">
+          <p class="text-lg mb-8">No QR Codes found</p>
+          <RouterLink to="/create" class="text-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded w-full text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Create QR Code</RouterLink>
+        </div>
       
      </div>
   </div>
