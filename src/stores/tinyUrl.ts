@@ -8,13 +8,13 @@ export interface createTinyUrlPayloadDto {
   generate_qr?: boolean;
 }
 
-export interface tinyUrlListDto {
+export interface tinyUrlDto {
   long_url: string;
   title?: string | null;
   custom_back_half?: string | null;
   qr_code?: string | null
   id: string;
-  expiration: string;
+  expiration?: string;
   created_at: string;
   copied?: boolean;
 }
@@ -37,10 +37,10 @@ export const useTinyUrlStore = defineStore('url', () => {
   async function createTinyUrl(tinyUrlDetails: createTinyUrlPayloadDto) {
     const response = await $http.post('/url', tinyUrlDetails);
     if (response.status == 'success') {
-      console.log(response)
     } else {
       error.value = response;
     }
+    return response;
   }
 
   async function getAllTinyUrlList() {
@@ -63,8 +63,18 @@ export const useTinyUrlStore = defineStore('url', () => {
     }
   }
 
-  async function updateTinyUrl(editUrlDetails: Partial<tinyUrlListDto>) {
+  async function updateTinyUrl(editUrlDetails: Partial<tinyUrlDto>) {
     const response = await $http.put(`/url`, editUrlDetails);
+    if (response.status == 'success') {
+      return response;
+    } else {
+      error.value = response;
+      return error;
+    }
+  }
+
+  async function getTinyUrlDetails(id: string) {
+    const response = await $http.get(`/url/${id}/details`);
     if (response.status == 'success') {
       return response;
     } else {
@@ -79,6 +89,7 @@ export const useTinyUrlStore = defineStore('url', () => {
     getAllTinyUrlList,
     deleteTinyUrl,
     updateTinyUrl,
+    getTinyUrlDetails,
     error
   }
 

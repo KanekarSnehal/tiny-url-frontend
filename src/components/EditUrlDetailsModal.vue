@@ -48,12 +48,12 @@
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
 import { ref, defineProps, defineEmits } from 'vue';
-import { type tinyUrlListDto } from '../stores/tinyUrl';
+import { type tinyUrlDto } from '../stores/tinyUrl';
 import IconLock from '@/components/icons/IconLock.vue';
 
 const props = defineProps({
     editUrlDetails: {
-        type: Object as () => Partial<tinyUrlListDto>,
+        type: Object as () => Partial<tinyUrlDto>,
         required: true,
     },
 });
