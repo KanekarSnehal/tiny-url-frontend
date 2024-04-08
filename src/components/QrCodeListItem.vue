@@ -6,7 +6,7 @@
 
         <div class="flex flex-col gap-4">
           <div class="flex flex-col">
-            <p class="text-xl font-bold">{{ qrCode.title }}</p>
+            <p @click="navigateToDetails(qrCode.id)" class="text-xl font-bold">{{ qrCode.title }}</p>
             <a target="_blank" :href="getTinyUrl(qrCode.custom_back_half ? qrCode.custom_back_half : qrCode.url_id)" class="font-bold text-sky-600">{{ qrCode.custom_back_half ? qrCode.custom_back_half : qrCode.url_id }}</a>
             <a target="_blank" :href="qrCode.long_url" class="text-sm">{{ qrCode.long_url }}</a>
           </div>
@@ -19,7 +19,7 @@
 
       </div>
 
-      <div class="ml-auto flex gap-3.5 shrink-0">
+      <div class="ml-auto flex gap-3.5 shrink-0 items-start">
         <div class="relative inline-block text-left">
           <button type="button" @click="toggleDownloadMenu"
               class="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700">
@@ -42,12 +42,11 @@
           </div>
         </div>
 
-        <div>
-          <button type="button" @click="emit('viewQrCodeDetails', qrCode.id)"
-              class="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700">
-              View Details
-          </button>
-        </div>
+        <button @click="navigateToDetails(qrCode.id)" type="button"
+            class="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700">
+            View Details
+        </button>
+        
       </div>
 
     </div>
@@ -58,6 +57,7 @@ import IconCalendar from '@/components/icons/IconCalendar.vue';
 import IconDownload from '@/components/icons/IconDownload.vue';
 import type { qrCodeDto } from '@/stores/qrCode';
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 const props = defineProps({
     qrCode: {
@@ -65,6 +65,8 @@ const props = defineProps({
         required: true,
     },
 });
+
+const router = useRouter();
 
 const showDownloadMenu = ref(false);
 
@@ -110,6 +112,10 @@ function downloadImage(type: string) {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+}
+
+function navigateToDetails(id: string) {
+  router.push(`/qrcodes/${id}/details`);
 }
 
 </script>

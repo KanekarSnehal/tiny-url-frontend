@@ -23,7 +23,16 @@ export const useQrCodeStore = defineStore('qr-code', () => {
 
     async function getAllQrCodeList() {
         const response = await $http.get('/qr-code');
-        console.log("response", response)
+        if (response.status == 'success') {
+            return response;
+        } else {
+            error.value = response;
+            return error;
+        }
+    }
+
+    async function getQrCodeDetails(id: string) {
+        const response = await $http.get(`/qr-code/${id}/details`);
         if (response.status == 'success') {
             return response;
         } else {
@@ -34,7 +43,8 @@ export const useQrCodeStore = defineStore('qr-code', () => {
 
     return {
         getAllQrCodeList,
-        error
+        error,
+        getQrCodeDetails
     }
 
 })
