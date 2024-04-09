@@ -3,7 +3,7 @@
      <div class="p-4 mt-14 w-8/12 mx-auto">
       <p class="text-3xl">QR Codes</p>
       <hr class="h-px mt-4 mb-8 bg-gray-200 border-0 dark:bg-gray-700">
-       <QrCodeListItem v-for="qrCode in state.qrCodeList" :key="qrCode.id" :qrCode="qrCode" @viewQrCodeDetails="viewQrCodeDetails"/>
+       <QrCodeListItem v-for="qrCode in state.qrCodeList" :key="qrCode.id" :qrCode="qrCode" @viewQrCodeDetails="viewQrCodeDetails" :showViewDetails="true"/>
 
        <div v-if="state.qrCodeList.length === 0" class="text-center mt-8">
           <p class="text-lg mb-8">No QR Codes found</p>
