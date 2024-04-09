@@ -35,9 +35,49 @@
                     </button>
                 </div>
             </div>
-        </div>
-    </div>
 
+            <div class="p-5 bg-white mb-8" v-if="state.engagementChartData.length">
+                <p class="font-semibold">Engagements over time</p>
+                <div class="flex flex-column justify-center">
+                    <Bar
+                        id="my-chart-id"
+                        :options="chartOptions"
+                        :data="state.engagementChartData"
+                        style="height: 300px; width: 600px"
+                    />
+                </div>
+            </div>
+
+            <div class="p-5 bg-white mb-8" v-if="state.locations.length">
+                <p class="font-semibold">Locations</p>
+                <div class="flex flex-column justify-center">
+                    <Bar
+                        id="my-chart-id"
+                        :options="chartOptions"
+                        :data="state.locations"
+                        style="height: 300px; width: 600px"
+                    />
+                </div>
+            </div>
+
+            <div class="p-5 bg-white" v-if="state.deviceChartData.length">
+                <p class="font-semibold">Device Types</p>
+                <div class="flex flex-column justify-center">
+                    <Doughnut
+                        :options="barChartOptions"
+                        :data="state.deviceChartData"
+                    />
+                </div>
+            </div>
+
+            <!-- empty state if no analytics found -->
+            <div v-if="!state.engagementChartData.length && !state.locations.length && !state.deviceChartData.length" class="flex flex-col items-center justify-center h-96">
+                <p class="text-lg font-semibold">No analytics found for this link</p>
+            </div>
+        </div>
+
+    </div>
+   
 <DeleteUrlModal v-if="isDeleteModalOpen" @closeDeleteModal="closeModal" @submitDeleteDetails="deleteUrl"/>
 
 <EditUrlDetailsModal v-if="isEditModalOpen" :editUrlDetails="editUrlDetails" @closeEditModal="closeEditModal" @submitEditDetails="submitEditDetails"/>
@@ -51,10 +91,25 @@ import IconEdit from '@/components/icons/IconEdit.vue';
 import IconDelete from '@/components/icons/IconDelete.vue';
 import IconLeftArrow from '@/components/icons/IconLeftArrow.vue';
 import { useTinyUrlStore, type tinyUrlDto } from '../stores/tinyUrl';
-import { onMounted, reactive, ref, computed } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import EditUrlDetailsModal from '@/components/EditUrlDetailsModal.vue';
 import DeleteUrlModal from '@/components/DeleteUrlModal.vue';
 import { useRoute, useRouter } from 'vue-router';
+import { Bar, Doughnut } from 'vue-chartjs';
+import { ArcElement } from 'chart.js';
+import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js'
+
+ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, ArcElement)
+
+const chartOptions = {
+    responsive: true,
+    height: 200,
+}
+
+const barChartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+}
 
 const tinyUrlStore = useTinyUrlStore();
 
@@ -73,7 +128,8 @@ const editUrlDetails = ref<Partial<tinyUrlDto>>({
 });
 
 
-const state: { tinyUrl: tinyUrlDto } = reactive({
+
+const state: { tinyUrl: tinyUrlDto, engagementChartData: any, locations: any, deviceChartData: any } = reactive({
     tinyUrl: {
         id: '',
         title: '',
@@ -83,6 +139,9 @@ const state: { tinyUrl: tinyUrlDto } = reactive({
         copied: false,
         qr_code: '',
     },
+    engagementChartData: [],
+    locations: [],
+    deviceChartData: []
 });
 
 const route = useRoute();
@@ -91,6 +150,44 @@ const urlId = route.params.id;
 onMounted(async () => {
     const response = await tinyUrlStore.getTinyUrlDetails(urlId.toString());
     state.tinyUrl = response.data;
+    state.engagementChartData = {
+        labels: response.data.engagement_over_time.map((e: { date: string }) => e.date),
+        datasets: [{
+            label: 'Clicks',
+            backgroundColor: '#3182CE',
+            borderColor: '#3182CE',
+            borderWidth: 1,
+            barPercentage: 1,
+            barThickness: 60,
+            maxBarThickness: 18,
+            minBarLength: 2,
+            categoryPercentage: 1,
+            data: response.data.engagement_over_time.map((e: { clicks: number }) => e.clicks),
+        }]
+    }
+    state.locations = {
+        labels: response.data.locations.map((e: { country: string }) => e.country),
+        datasets: [{
+            label: 'Clicks',
+            backgroundColor: '#3182CE',
+            borderColor: '#3182CE',
+            borderWidth: 1,
+            barPercentage: 1,
+            barThickness: 60,
+            maxBarThickness: 18,
+            minBarLength: 2,
+            categoryPercentage: 1,
+            data: response.data.locations.map((e: { clicks: number }) => e.clicks),
+        }]
+    }
+    state.deviceChartData = {
+        labels: response.data.device_data.map((e: { browser: string, os: string, device_type: string }) => `${e.device_type} - ${e.browser} - ${e.os}`),
+        datasets: [{
+            label: 'Clicks',
+            backgroundColor: ['#3182CE', '#63B3ED', '#93C5FD', '#A5B4FC', '#C4B5FD', '#D1BCFD', '#E0E7FF', '#E5E7FF', '#E7E9FF', '#E9EDFF', '#F0F5FF', '#F5F8FF', '#F8FAFF', '#FAFCFF', '#FCFDFF', '#FDFEFF'],
+            data: response.data.device_data.map((e: { clicks: number }) => e.clicks),
+        }],
+    }
 })
 
 function formattedDate(dateObject: { toLocaleDateString: (arg0: string, arg1: { year: string; month: string; day: string; }) => void; }) {
