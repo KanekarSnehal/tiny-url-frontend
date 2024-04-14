@@ -51,10 +51,32 @@ export const useAuthStore = defineStore('auth', () => {
           }
     }
 
+    async function logout() {
+        const response = await $http.post('/auth/logout', {});
+        if(response == 'success') {
+            user.value = { email: '', name: '', profile_image: '' };
+            $http.setAccessToken('');
+            error.value = response;
+        }
+        return response;
+    }
+    
+    async function getUser() {
+        const response = await $http.get('/user');
+        if(response.status == 'success') {
+            user.value = { email: response.data.email, name: response.data.name, profile_image: response.data.profile_image };
+        } else {
+            error.value = response;
+        }
+        return response;
+    }
+
     return {
         user,
         error,
         login,
-        register
+        register,
+        logout,
+        getUser
     }
 });
