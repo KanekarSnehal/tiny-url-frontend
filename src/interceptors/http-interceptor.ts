@@ -1,12 +1,14 @@
 import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosResponse, AxiosError, AxiosHeaders } from 'axios';
 import { type InternalAxiosRequestConfig } from 'axios';
 import { ref, type App } from 'vue';
+import router from '@/router';
+import type { Router } from 'vue-router';
 
 class HttpClient {
     private axiosInstance: AxiosInstance;
     private accessToken = ref<string | null>(localStorage.getItem('access_token'));
 
-    constructor() {
+    constructor(private router: Router) {
         this.axiosInstance = axios.create({
             baseURL: import.meta.env.VITE_BACKEND_URL,
             timeout: 1000,
@@ -17,7 +19,7 @@ class HttpClient {
         // Add a request interceptor
         this.axiosInstance.interceptors.request.use(
             (config: InternalAxiosRequestConfig) => {
-                if (this.accessToken.value && !config.url?.includes('/auth')) {
+                if (this.accessToken.value && !config.url?.includes('/auth/login') && !config.url?.includes('/auth/signup')) {
                     config.headers.Authorization = `Bearer ${this.accessToken.value}`;
                 }
                 return config;
@@ -33,6 +35,12 @@ class HttpClient {
                 return response;
             },
             (error: AxiosError) => {
+                //  if status code is 403 then logout and redirect to login
+                if (error.response?.status === 403) {
+                    this.router.push({ name: 'login' });
+                    localStorage.removeItem('access_token');
+                    this.accessToken.value = null;
+                }
                 return error.response;
             }
         );
@@ -75,7 +83,7 @@ class HttpClient {
     }
 
     public static install(app: App) {
-        app.provide('$http', new HttpClient());
+        app.provide('$http', new HttpClient(router));
         return this;
     }
 
