@@ -20,10 +20,13 @@ import { useAuthStore } from '@/stores/auth';
 const authStore = useAuthStore();
 const name = authStore.user.name;
 
-function logout() {
-    localStorage.removeItem('user');
-    authStore.$patch({ user: undefined });
-    router.push('/login');
+async function logout() {
+    const response = await authStore.logout();
+    // if (response.status == 'success') {
+    //     // localStorage.removeItem('user');
+    //     // localStorage.removeItem('access_token');
+    //     // router.push('/login');
+    // }
 }
 
 </script>

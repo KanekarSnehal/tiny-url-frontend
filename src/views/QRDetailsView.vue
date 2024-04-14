@@ -7,7 +7,7 @@
             </RouterLink>
             <QrCodeListItem :qrCode="state.qrCode" :showViewDetails="false"/>
 
-            <div class="p-5 bg-white mb-8" v-if="state.engagementChartData.length">
+            <div class="p-5 bg-white mb-8" v-if="state.engagementChartData.datasets.length">
                 <p class="font-semibold">Engagements over time</p>
                 <div class="flex flex-column justify-center">
                     <Bar
@@ -19,7 +19,7 @@
                 </div>
             </div>
 
-            <div class="p-5 bg-white mb-8" v-if="state.locations.length">
+            <div class="p-5 bg-white mb-8" v-if="state.locations.datasets.length">
                 <p class="font-semibold">Locations</p>
                 <div class="flex flex-column justify-center">
                     <Bar
@@ -31,7 +31,7 @@
                 </div>
             </div>
 
-            <div class="p-5 bg-white" v-if="state.deviceChartData.length">
+            <div class="p-5 bg-white" v-if="state.deviceChartData.datasets.length">
                 <p class="font-semibold">Device Types</p>
                 <div class="flex flex-column justify-center">
                     <Doughnut
@@ -42,7 +42,7 @@
             </div>
 
             <!-- empty state if no analytics found -->
-            <div v-if="!state.engagementChartData.length && !state.locations.length && !state.deviceChartData.length" class="flex flex-col items-center justify-center h-96">
+            <div v-if="!state.engagementChartData.datasets.length && !state.locations.datasets.length && !state.deviceChartData.datasets.length" class="flex flex-col items-center justify-center h-96">
                 <p class="text-lg font-semibold">No analytics found for this link</p>
             </div>
         </div>
@@ -82,9 +82,9 @@ const state: { qrCode: qrCodeDto, engagementChartData: any, locations: any, devi
         qr_code: '',
         url_id: '',
     },
-    engagementChartData: [],
-    locations: [],
-    deviceChartData: []
+    engagementChartData: { labels: [], datasets: [] },
+    locations: { labels: [], datasets: [] },
+    deviceChartData: { labels: [], datasets: [] }
 });
 
 const qrCodeStore = useQrCodeStore();
@@ -95,7 +95,7 @@ const urlId = route.params.id;
 onMounted(async () => {
     const response = await qrCodeStore.getQrCodeDetails(urlId.toString());
     state.qrCode = response.data;
-    state.engagementChartData = {
+    response.data.engagement_over_time && response.data.engagement_over_time.length && (state.engagementChartData = {
         labels: response.data.engagement_over_time.map((e: { date: string }) => e.date),
         datasets: [{
             label: 'Clicks',
@@ -109,8 +109,8 @@ onMounted(async () => {
             categoryPercentage: 1,
             data: response.data.engagement_over_time.map((e: { clicks: number }) => e.clicks),
         }]
-    }
-    state.locations = {
+    })
+    response.data.locations && response.data.locations.length && (state.locations = {
         labels: response.data.locations.map((e: { country: string }) => e.country),
         datasets: [{
             label: 'Clicks',
@@ -124,15 +124,15 @@ onMounted(async () => {
             categoryPercentage: 1,
             data: response.data.locations.map((e: { clicks: number }) => e.clicks),
         }]
-    }
-    state.deviceChartData = {
+    })
+    response.data.device_data && response.data.device_data.length && (state.deviceChartData = {
         labels: response.data.device_data.map((e: { browser: string, os: string, device_type: string }) => `${e.device_type} - ${e.browser} - ${e.os}`),
         datasets: [{
             label: 'Clicks',
             backgroundColor: ['#3182CE', '#63B3ED', '#93C5FD', '#A5B4FC', '#C4B5FD', '#D1BCFD', '#E0E7FF', '#E5E7FF', '#E7E9FF', '#E9EDFF', '#F0F5FF', '#F5F8FF', '#F8FAFF', '#FAFCFF', '#FCFDFF', '#FDFEFF'],
             data: response.data.device_data.map((e: { clicks: number }) => e.clicks),
         }],
-    }
+    })
 })
 
 </script>

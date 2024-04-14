@@ -154,8 +154,8 @@ function closeEditModal() {
   isEditModalOpen.value = false;
 };
 
-async function submitEditDetails(url: Partial<tinyUrlDto>) {
-  const response = await tinyUrlStore.updateTinyUrl(url);
+async function submitEditDetails(url: Partial<tinyUrlDto>, urlId: string) {
+  const response = await tinyUrlStore.updateTinyUrl(url, urlId);
   if (response.status == "success") {
     isEditModalOpen.value = false;
     const response = await tinyUrlStore.getAllTinyUrlList();
