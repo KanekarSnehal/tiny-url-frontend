@@ -65,7 +65,7 @@ function closeEditModal() {
 }
 
 function submitEditDetails() {
-    emits('submitEditDetails', { title: title.value, custom_back_half: backhalf.value, id: props.editUrlDetails.id });
+    emits('submitEditDetails', { title: title.value, custom_back_half: backhalf.value }, props.editUrlDetails.id);
 }
 
 // Form validation
