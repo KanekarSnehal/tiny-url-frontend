@@ -60,7 +60,7 @@
                 </div>
             </div>
 
-            <div class="p-5 bg-white" v-if="state.deviceChartData.datasets.length">
+            <div class="p-5 bg-white mb-8" v-if="state.deviceChartData.datasets.length">
                 <p class="font-semibold">Device Types</p>
                 <div class="flex flex-column justify-center">
                     <Doughnut
@@ -98,7 +98,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { Bar, Doughnut } from 'vue-chartjs';
 import { ArcElement } from 'chart.js';
 import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js'
-
+import { buildEngagementChartData, buildLocationsChartData, buildDeviceChartData } from '../utils/chartDataUtils';
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, ArcElement)
 
 const chartOptions = {
@@ -150,44 +150,9 @@ const urlId = route.params.id;
 onMounted(async () => {
     const response = await tinyUrlStore.getTinyUrlDetails(urlId.toString());
     state.tinyUrl = response.data;
-    response.data.engagement_over_time && response.data.engagement_over_time.length && (state.engagementChartData = {
-        labels: response.data.engagement_over_time.map((e: { date: string }) => e.date),
-        datasets: [{
-            label: 'Clicks',
-            backgroundColor: '#3182CE',
-            borderColor: '#3182CE',
-            borderWidth: 1,
-            barPercentage: 1,
-            barThickness: 60,
-            maxBarThickness: 18,
-            minBarLength: 2,
-            categoryPercentage: 1,
-            data: response.data.engagement_over_time.map((e: { clicks: number }) => e.clicks),
-        }]
-    })
-    response.data.locations && response.data.locations.length && (state.locations = {
-        labels: response.data.locations.map((e: { country: string }) => e.country),
-        datasets: [{
-            label: 'Clicks',
-            backgroundColor: '#3182CE',
-            borderColor: '#3182CE',
-            borderWidth: 1,
-            barPercentage: 1,
-            barThickness: 60,
-            maxBarThickness: 18,
-            minBarLength: 2,
-            categoryPercentage: 1,
-            data: response.data.locations.map((e: { clicks: number }) => e.clicks),
-        }]
-    })
-    response.data.device_data && response.data.device_data.length && (state.deviceChartData = {
-        labels: response.data.device_data.map((e: { browser: string, os: string, device_type: string }) => `${e.device_type} - ${e.browser} - ${e.os}`),
-        datasets: [{
-            label: 'Clicks',
-            backgroundColor: ['#3182CE', '#63B3ED', '#93C5FD', '#A5B4FC', '#C4B5FD', '#D1BCFD', '#E0E7FF', '#E5E7FF', '#E7E9FF', '#E9EDFF', '#F0F5FF', '#F5F8FF', '#F8FAFF', '#FAFCFF', '#FCFDFF', '#FDFEFF'],
-            data: response.data.device_data.map((e: { clicks: number }) => e.clicks),
-        }],
-    })
+    response.data.engagement_over_time && response.data.engagement_over_time.length && (state.engagementChartData = buildEngagementChartData(response.data.engagement_over_time));
+    response.data.locations && response.data.locations.length && (state.locations = buildLocationsChartData(response.data.locations));
+    response.data.device_data && response.data.device_data.length && (state.deviceChartData = buildDeviceChartData(response.data.device_data));
 })
 
 function formattedDate(dateObject: { toLocaleDateString: (arg0: string, arg1: { year: string; month: string; day: string; }) => void; }) {
