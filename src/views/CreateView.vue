@@ -43,11 +43,11 @@
                 </label>
              </div>
           </div>
-          <div class="fixed bottom-0 z-20 w-full bg-white">
+          <div class="fixed bottom-0 z-20 left-0 w-full bg-white mx-auto">
              <hr>
-             <div class="ml-auto p-4">
-                 <RouterLink to="/" class="text-blue-700 mr-6">Cancel</RouterLink>
-                 <button class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Submit</button>
+             <div class="flex justify-end items-center p-4">
+                 <RouterLink to="/links" class="text-blue-700 mr-6">Cancel</RouterLink>
+                 <button class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Submit</button>
              </div>
              <div>
              </div>
@@ -60,12 +60,13 @@ import IconLock from '@/components/icons/IconLock.vue';
 import { useForm } from 'vee-validate';
 import { useTinyUrlStore, type createTinyUrlPayloadDto } from '../stores/tinyUrl';
 import { useRouter } from 'vue-router';
+import { toast } from 'vue3-toastify';
 
 const tinyUrlStore = useTinyUrlStore();
 const router = useRouter();
 
 function validUrl(value: string) {
-   const urlPattern = /^(https?:\/\/)?([\w.]+)\.([a-z]{2,})(\/\S*)?$/i;
+   const urlPattern = /^(https?:\/\/)?([\w.-]+)\.([a-z]{2,})(\/\S*)?$/i;
    if (value && urlPattern.test(value)) {
       return true;
    }
@@ -75,7 +76,7 @@ function validUrl(value: string) {
 // Create the form
 const { defineField, handleSubmit, errors } = useForm({
    initialValues: {
-      domain: "tinyurl.com",
+      domain: import.meta.env.VITE_DOMAIN_NAME,
       destination: '',
       title: null,
       backhalf: null,
@@ -94,20 +95,22 @@ const [backhalf, backhalfProps] = defineField('backhalf');
 const [generateQR, generateQRProps] = defineField('generateQR');
 
 
-
-
 // Submit handler
 const onSubmit = handleSubmit(async formValues => {
    // Submit to API
-   console.log(formValues);
    const createTinyUrlPayload: createTinyUrlPayloadDto = {
       long_url: formValues.destination,
       title: formValues.title,
       custom_back_half: formValues.backhalf,
       generate_qr: formValues.generateQR
    }
-   await tinyUrlStore.createTinyUrl(createTinyUrlPayload);
-   router.push('/links');
+   const response = await tinyUrlStore.createTinyUrl(createTinyUrlPayload);
+   if (response.status == "success") {
+      toast.success('Tiny URL created successfully')
+      router.push('/links');
+      return;
+   }
+   toast.error(response.message);
 });
 
 </script>

@@ -49,12 +49,6 @@
             </button>
           </div>
           <div v-if="error" class="text-red-600">{{ error }}</div>
-          <div class="text-center mt-4">
-            <span>or sign up with</span>
-          </div>
-          <!-- <SocialSignUp /> -->
-          <div class="text-center mt-4">
-          </div>
           <div class="text-center">
             <p>Already have an account? <RouterLink to="/auth/login">Sign In</RouterLink></p>
           </div>
@@ -72,6 +66,7 @@ import { useRouter } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
 import { ref } from 'vue';
 import { useForm } from 'vee-validate';
+import { toast } from 'vue3-toastify';
 
 const router = useRouter();
 const userStore = useAuthStore();
@@ -127,15 +122,16 @@ const [name, nameProps] = defineField('name');
 
 const onSubmit = handleSubmit(async () => {
   try {
-    await userStore.register({ email: email.value, password: password.value, name: name.value });
-    if (userStore.error.explanation) {
-      error.value = userStore.error.explanation;
-    } else {
+    const response = await userStore.register({ email: email.value, password: password.value, name: name.value });
+    if(response.status == 'success') {
+      toast.success('Account created successfully, please login to continue');
       router.push('/auth/login');
+      return;
     }
+    toast.error('Email already exists, please login to continue');
+    
   } catch (error) {
-    // Handle error, such as displaying an error message
-    console.log(error);
+    toast.error((error as Error).toString());
   }
 });
 </script>

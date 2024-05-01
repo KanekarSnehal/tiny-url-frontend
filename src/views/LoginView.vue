@@ -37,12 +37,7 @@
               Sign In
             </button>
           </div>
-          <div v-if="error" class="error text-red-600">{{ error }}</div>
         </form>
-        <div class="login-choice mt-4 text-center">
-          <span>or Sign In with</span>
-        </div>
-        <!-- <SocialLogin /> -->
         <div class="mt-4 text-center">
           <p>Don't have an account? <RouterLink to="/auth/signup">Create one now</RouterLink></p>
         </div>
@@ -56,12 +51,11 @@
   //   import SocialLogin from '../components/SocialLogin.vue';
   import { useRouter } from 'vue-router';
   import { useAuthStore } from '../stores/auth';
-  import { ref } from 'vue';
   import { useForm } from 'vee-validate';
+  import { toast } from 'vue3-toastify';
 
   const router = useRouter();
   const userStore = useAuthStore();
-  const error = ref('');
 
   // create form
   const { defineField, handleSubmit, errors } = useForm({
@@ -103,17 +97,15 @@
 
   const onSubmit = handleSubmit(async () => {
     try {
-      await userStore.login({ email: email.value, password: password.value });
-      if (userStore.error.explanation) {
-        error.value = userStore.error.explanation;
+      const response = await userStore.login({ email: email.value, password: password.value });
+      if (response.statusCode == 401) {
+        toast.error('Invalid email or password');
         return;
       }
+      toast.success('Login successful');
       router.push('/home');
-      // userStore.user.role == 1 ? router.push('/admin') : router.push('/home');
-
     } catch (error) {
-      // Handle error, such as displaying an error message
-      console.error(error);
+      toast.error((error as Error).toString());
     }
   });
 

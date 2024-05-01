@@ -22,11 +22,6 @@ export const useAuthStore = defineStore('auth', () => {
         profile_image: userDetails ? userDetails.profile_image : '',
     });
     const $http = inject<any>('$http')!;
-    const error = ref({
-        explanation: '',
-        name: '',
-        message: ''
-    });
 
     async function login({ email, password }: LoginParams) {
         const response = await $http.post('/auth/login', { email, password });
@@ -35,20 +30,13 @@ export const useAuthStore = defineStore('auth', () => {
             localStorage.setItem('user', JSON.stringify(user.value));
             localStorage.setItem('access_token', response.data.access_token);
             $http.setAccessToken(response.data.access_token);
-        } else {
-            error.value = response;
         }
+        return response;
     }
 
     async function register({ email, password, name }: SignUpParams) {
         const response = await $http.post('/auth/signup', { email, password, name });
-        console.log(response);
-        if (response.status == 'success') {
-            return response;
-          } else {
-            error.value = response;
-            return error;
-          }
+        return response;
     }
 
     async function logout() {
@@ -56,7 +44,6 @@ export const useAuthStore = defineStore('auth', () => {
         if(response == 'success') {
             user.value = { email: '', name: '', profile_image: '' };
             $http.setAccessToken('');
-            error.value = response;
         }
         return response;
     }
@@ -65,15 +52,12 @@ export const useAuthStore = defineStore('auth', () => {
         const response = await $http.get('/user');
         if(response.status == 'success') {
             user.value = { email: response.data.email, name: response.data.name, profile_image: response.data.profile_image };
-        } else {
-            error.value = response;
         }
         return response;
     }
 
     return {
         user,
-        error,
         login,
         register,
         logout,

@@ -16,7 +16,6 @@
 </template>
 
 <script setup lang="ts">
-import router from '@/router';
 import { useAuthStore } from '@/stores/auth';
 import { onMounted, ref } from 'vue';
 const authStore = useAuthStore();
