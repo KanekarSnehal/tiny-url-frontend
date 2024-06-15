@@ -11,7 +11,7 @@ class HttpClient {
     constructor(private router: Router) {
         this.axiosInstance = axios.create({
             baseURL: import.meta.env.VITE_BACKEND_URL,
-            timeout: 1000,
+            timeout: 10000,
             withCredentials: true,
             headers: { 'Content-Type': 'application/json' }
         });
@@ -57,28 +57,28 @@ class HttpClient {
         return this.accessToken.value;
     }
 
-    public async get<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
-        const response = await this.axiosInstance.get<T>(url, config);
+    public async get<T>(url: string, config?: AxiosRequestConfig) {
+        const response = await this.axiosInstance.get<{ message?: string, data: T, status: "success" | "error"}>(url, config);
         return response.data;
     }
 
-    public async delete<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
-        const response = await this.axiosInstance.delete<T>(url, config);
+    public async delete<T>(url: string, config?: AxiosRequestConfig): Promise<{ message?: string, data: T, status: "success" | "error"}> {
+        const response = await this.axiosInstance.delete<{ message?: string, data: T, status: "success" | "error"}>(url, config);
         return response.data;
     }
 
-    public async post<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
-        const response = await this.axiosInstance.post<T>(url, data, config);
+    public async post<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<{ message?: string, data: T, status: "success" | "error"}> {
+        const response = await this.axiosInstance.post<{ message?: string, data: T, status: "success" | "error"}>(url, data, config);
         return response.data;
     }
 
-    public async put<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
-        const response = await this.axiosInstance.put<T>(url, data, config);
+    public async put<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<{ message?: string, data: T, status: "success" | "error"}> {
+        const response = await this.axiosInstance.put<{ message?: string, data: T, status: "success" | "error"}>(url, data, config);
         return response.data;
     }
 
-    public async patch<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
-        const response = await this.axiosInstance.patch<T>(url, data, config);
+    public async patch<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<{ message?: string, data: T, status: "success" | "error"}> {
+        const response = await this.axiosInstance.patch<{ message?: string, data: T, status: "success" | "error"}>(url, data, config);
         return response.data;
     }
 

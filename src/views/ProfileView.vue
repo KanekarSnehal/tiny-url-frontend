@@ -9,43 +9,23 @@
                  <h2 class="text-lg font-semibold">{{ user.email }}</h2>
                  <p class="text-gray-500"></p>
              </div>
-            <button @click="logout" class="bg-red-500 text-white px-4 py-2 rounded-md">Logout</button>
+            <button @click="doLogout" class="bg-red-500 text-white px-4 py-2 rounded-md">Logout</button>
          </div>
      </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
-import { onMounted, ref } from 'vue';
-const authStore = useAuthStore();
+const { user, logout } = useAuthStore();
+const router = useRouter();
 
-interface User {
-    name: string;
-    email: string;
-    profile_image?: string;
-}
-
-const user = ref<User>({
-    name: '',
-    email: '',
-    profile_image: ''
-});
-
-onMounted(async () => {
-    const response = await authStore.getUser();
-    if(response.status == 'success') {
-        user.value = response.data;
+async function doLogout() {
+    const response = await logout();
+    if (response.status == 'success') {
+        router.push({ name: 'login' });
     }
-});
-
-async function logout() {
-    const response = await authStore.logout();
-    // if (response.status == 'success') {
-    //     // localStorage.removeItem('user');
-    //     // localStorage.removeItem('access_token');
-    //     // router.push('/login');
-    // }
 }
 
 </script>

@@ -1,7 +1,6 @@
 import type { HttpClient } from '@/interceptors/http-interceptor';
-import type { AxiosInstance, AxiosStatic } from 'axios';
 import { defineStore } from 'pinia';
-import { ref, inject } from 'vue';
+import { ref, inject, readonly } from 'vue';
 
 interface LoginParams {
     email: string;
@@ -14,6 +13,13 @@ interface SignUpParams {
     name: string;
 }
 
+interface User {
+    email: string;
+    name: string;
+    profile_image: string;
+    access_token: string;
+}
+
 export const useAuthStore = defineStore('auth', () => {
     const userDetails = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')!) : null;
     const user = ref({
@@ -21,10 +27,10 @@ export const useAuthStore = defineStore('auth', () => {
         name: userDetails ? userDetails.name : '',
         profile_image: userDetails ? userDetails.profile_image : '',
     });
-    const $http = inject<any>('$http')!;
+    const $http = inject<HttpClient>('$http')!;
 
     async function login({ email, password }: LoginParams) {
-        const response = await $http.post('/auth/login', { email, password });
+        const response = await $http.post<User>('/auth/login', { email, password });
         if(response.status == 'success') {
             user.value = { email: response.data.email, name: response.data.name, profile_image: response.data.profile_image };
             localStorage.setItem('user', JSON.stringify(user.value));
@@ -41,15 +47,17 @@ export const useAuthStore = defineStore('auth', () => {
 
     async function logout() {
         const response = await $http.post('/auth/logout', {});
-        if(response == 'success') {
+        if(response.status == 'success') {
             user.value = { email: '', name: '', profile_image: '' };
+            localStorage.removeItem('user');
+            localStorage.removeItem('access_token');
             $http.setAccessToken('');
         }
         return response;
     }
     
     async function getUser() {
-        const response = await $http.get('/user');
+        const response = await $http.get<User>('/user');
         if(response.status == 'success') {
             user.value = { email: response.data.email, name: response.data.name, profile_image: response.data.profile_image };
         }
@@ -57,7 +65,7 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     return {
-        user,
+        user: readonly(user),
         login,
         register,
         logout,
