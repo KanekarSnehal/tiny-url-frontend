@@ -61,7 +61,6 @@
   
 
 <script setup lang="ts">
-// import SocialSignUp from '../components/SocialLogin.vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
 import { ref } from 'vue';
@@ -124,11 +123,11 @@ const onSubmit = handleSubmit(async () => {
   try {
     const response = await userStore.register({ email: email.value, password: password.value, name: name.value });
     if(response.status == 'success') {
-      toast.success('Account created successfully, please login to continue');
+      toast.success('Account created successfully, Please Sign In to continue');
       router.push('/auth/login');
       return;
     }
-    toast.error('Email already exists, please login to continue');
+    toast.error('Email already exists, Please Sign In to continue');
     
   } catch (error) {
     toast.error((error as Error).toString());

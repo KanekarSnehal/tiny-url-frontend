@@ -48,7 +48,6 @@
   
   
   <script setup lang="ts">
-  //   import SocialLogin from '../components/SocialLogin.vue';
   import { useRouter } from 'vue-router';
   import { useAuthStore } from '../stores/auth';
   import { useForm } from 'vee-validate';
@@ -99,7 +98,7 @@
     try {
       const response = await userStore.login({ email: email.value, password: password.value });
       if (response.statusCode == 401) {
-        toast.error('Invalid email or password');
+        toast.error('Account with given email or password does not exists');
         return;
       }
       toast.success('Login successful');
