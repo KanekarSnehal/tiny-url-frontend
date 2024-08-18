@@ -10,8 +10,8 @@
                 </svg>
              </button>
             <a href="/home" class="flex ms-2 md:me-24">
-              <div className="text-center text-white bg-blue-700 rounded-full p-2 mr-2">
-                <IconLogo className="h-10 w-10" />
+              <div className="text-center text-white bg-blue-700 rounded-full p-2 mr-2 h-10 w-10">
+                <IconLogo />
               </div>
               <span class="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap dark:text-white">Tiny URL</span>
             </a>
