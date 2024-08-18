@@ -58,27 +58,27 @@ class HttpClient {
     }
 
     public async get<T>(url: string, config?: AxiosRequestConfig) {
-        const response = await this.axiosInstance.get<{ message?: string, data: T, status: "success" | "error"}>(url, config);
+        const response = await this.axiosInstance.get<{ message?: string, data: T, status: "success" | "error", statusCode: number}>(url, config);
         return response.data;
     }
 
-    public async delete<T>(url: string, config?: AxiosRequestConfig): Promise<{ message?: string, data: T, status: "success" | "error"}> {
-        const response = await this.axiosInstance.delete<{ message?: string, data: T, status: "success" | "error"}>(url, config);
+    public async delete<T>(url: string, config?: AxiosRequestConfig): Promise<{ message?: string, data: T, status: "success" | "error", statusCode: number}> {
+        const response = await this.axiosInstance.delete<{ message?: string, data: T, status: "success" | "error", statusCode: number}>(url, config);
         return response.data;
     }
 
-    public async post<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<{ message?: string, data: T, status: "success" | "error"}> {
-        const response = await this.axiosInstance.post<{ message?: string, data: T, status: "success" | "error"}>(url, data, config);
+    public async post<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<{ message?: string, data: T, status: "success" | "error", statusCode: number}> {
+        const response = await this.axiosInstance.post<{ message?: string, data: T, status: "success" | "error", statusCode: number}>(url, data, config);
         return response.data;
     }
 
-    public async put<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<{ message?: string, data: T, status: "success" | "error"}> {
-        const response = await this.axiosInstance.put<{ message?: string, data: T, status: "success" | "error"}>(url, data, config);
+    public async put<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<{ message?: string, data: T, status: "success" | "error", statusCode: number}> {
+        const response = await this.axiosInstance.put<{ message?: string, data: T, status: "success" | "error", statusCode: number}>(url, data, config);
         return response.data;
     }
 
-    public async patch<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<{ message?: string, data: T, status: "success" | "error"}> {
-        const response = await this.axiosInstance.patch<{ message?: string, data: T, status: "success" | "error"}>(url, data, config);
+    public async patch<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<{ message?: string, data: T, status: "success" | "error", statusCode: number}> {
+        const response = await this.axiosInstance.patch<{ message?: string, data: T, status: "success" | "error", statusCode: number}>(url, data, config);
         return response.data;
     }
 
